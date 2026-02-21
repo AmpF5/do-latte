@@ -5,6 +5,7 @@ use ratatui::{
     widgets::{Block, Widget},
 };
 
+#[derive(Default)]
 pub struct ToDoListWidget {}
 
 impl ToDoListWidget {
@@ -18,7 +19,7 @@ impl Widget for ToDoListWidget {
         let instructions = Line::from(vec!["[a] - add new".into()]);
 
         let block = Block::bordered()
-            .title("[1] List")
+            .title("[2] List")
             .title_bottom(instructions);
 
         block.render(area, buf);

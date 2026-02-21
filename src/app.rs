@@ -5,7 +5,10 @@ use ratatui::{
     widgets::Block,
 };
 
-use crate::{todo_item::TodoItem, widgets::todo_list_widget::ToDoListWidget};
+use crate::{
+    todo_item::TodoItem,
+    widgets::{categories_widget::CategoriesWidget, todo_list_widget::ToDoListWidget},
+};
 
 #[derive(Default)]
 pub struct App {
@@ -41,6 +44,7 @@ impl App {
             Layout::horizontal([Constraint::Percentage(30), Constraint::Percentage(70)])
                 .areas(frame.area());
 
+        frame.render_widget(CategoriesWidget::new(), left);
         frame.render_widget(ToDoListWidget::new(), right);
     }
 }
