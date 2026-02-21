@@ -1,4 +1,5 @@
 use crate::app::App;
+pub mod widgets;
 
 pub mod app;
 pub mod todo_item;
