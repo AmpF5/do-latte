@@ -8,29 +8,27 @@ use crossterm::{
 use futures::StreamExt;
 use ratatui::{
     crossterm::{self, cursor, terminal::EnterAlternateScreen},
-    prelude::{Backend, CrosstermBackend},
+    prelude::CrosstermBackend,
 };
-use tokio::sync::mpsc::UnboundedSender;
-
-use crate::action::Action;
 
 pub struct Tui {
     pub terminal: ratatui::Terminal<CrosstermBackend<Stdout>>,
 }
 
 impl Tui {
-    pub fn new() -> Self {
-        Tui {
-            terminal: ratatui::Terminal::new(CrosstermBackend::new(stdout()))
-                .expect("error initializing terminal"),
-        }
+    pub fn new() -> color_eyre::Result<Self> {
+        Ok(Tui {
+            terminal: ratatui::Terminal::new(CrosstermBackend::new(stdout()))?,
+        })
     }
 
-    pub fn enter(&mut self) {
-        crossterm::terminal::enable_raw_mode().unwrap();
-        crossterm::execute!(stdout(), EnterAlternateScreen, cursor::Hide).unwrap();
+    pub fn enter(&mut self) -> color_eyre::Result<()> {
+        crossterm::terminal::enable_raw_mode()?;
+        crossterm::execute!(stdout(), EnterAlternateScreen, cursor::Hide)?;
 
         self.start();
+
+        Ok(())
     }
 
     pub fn start(&mut self) {}
@@ -57,9 +55,10 @@ impl Tui {
             }
         }
     }
+    pub fn exit(&mut self) -> color_eyre::Result<()> {
+        crossterm::execute!(stdout(), LeaveAlternateScreen, cursor::Show)?;
+        crossterm::terminal::disable_raw_mode()?;
 
-    pub fn exit(&mut self) {
-        crossterm::execute!(stdout(), LeaveAlternateScreen, cursor::Show);
-        crossterm::terminal::disable_raw_mode();
+        Ok(())
     }
 }

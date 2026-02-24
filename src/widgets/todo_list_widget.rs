@@ -1,10 +1,4 @@
-use ratatui::{
-    Frame,
-    buffer::Buffer,
-    layout::Rect,
-    text::Line,
-    widgets::{Block, Widget},
-};
+use ratatui::{Frame, layout::Rect, widgets::Block};
 
 use crate::widgets::component::Component;
 

@@ -1,14 +1,8 @@
-use ratatui::{
-    DefaultTerminal, Frame,
-    crossterm::event::{self, KeyCode, KeyEvent},
-    layout::{Constraint, Layout},
-    widgets::Block,
-};
+use ratatui::crossterm::event::{self, KeyCode};
 use tokio::sync::mpsc;
 
 use crate::{
     action::Action,
-    todo_item::TodoItem,
     tui::Tui,
     widgets::{
         categories_widget::CategoriesWidget, component::Component, todo_list_widget::ToDoListWidget,
@@ -37,19 +31,18 @@ impl App {
         }
     }
     // main app loop
-    pub fn run(&mut self, terminal: &mut DefaultTerminal) -> anyhow::Result<()> {
-        let mut tui = Tui::new();
+    pub fn run(&mut self) -> color_eyre::Result<()> {
+        let mut tui = Tui::new()?;
 
-        tui.enter();
+        tui.enter()?;
 
         for component in self.components.iter_mut() {
             component.register_action_handler(self.action_tx.clone());
         }
 
         loop {
-            // terminal.draw(self.render())?;
             if let Some(key) = event::read()?.as_key_press_event() {
-                self.render(&mut tui);
+                self.render(&mut tui)?;
                 match key.code {
                     KeyCode::Char('q') => {
                         tui.exit();
@@ -62,11 +55,13 @@ impl App {
         Ok(())
     }
 
-    fn render(&mut self, tui: &mut Tui) {
+    fn render(&mut self, tui: &mut Tui) -> color_eyre::Result<()> {
         tui.terminal.draw(|f| {
             for component in self.components.iter_mut() {
                 component.draw(f, f.area());
             }
-        });
+        })?;
+
+        Ok(())
     }
 }

@@ -7,10 +7,9 @@ pub mod todo_item;
 pub mod tui;
 
 #[tokio::main(flavor = "current_thread")]
-async fn main() -> anyhow::Result<()> {
-    let mut terminal = ratatui::init();
+async fn main() -> color_eyre::Result<()> {
     let mut app = App::new();
-    let result = app.run(&mut terminal);
+    let result = app.run();
     ratatui::restore();
     result
 }
