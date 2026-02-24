@@ -1,4 +1,8 @@
-use ratatui::{Frame, layout::Rect, widgets::Block};
+use ratatui::{
+    Frame,
+    layout::{Constraint, Rect},
+    widgets::Block,
+};
 
 use crate::widgets::component::Component;
 
@@ -18,7 +22,11 @@ impl Component for ToDoListWidget {
         println!("{:?}", key);
     }
 
+    fn constraint(&self) -> Constraint {
+        Constraint::Percentage(70)
+    }
+
     fn draw(&mut self, frame: &mut Frame, area: Rect) {
-        frame.render_widget(Block::bordered().title("To do"), area);
+        frame.render_widget(Block::bordered().title("[2] ToDos"), area);
     }
 }

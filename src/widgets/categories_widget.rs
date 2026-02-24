@@ -1,5 +1,6 @@
 use ratatui::{
-    layout::Rect,
+    Frame,
+    layout::{Constraint, Rect},
     prelude::Buffer,
     widgets::{Block, Widget},
 };
@@ -15,15 +16,12 @@ impl CategoriesWidget {
     }
 }
 
-impl Component for CategoriesWidget {}
+impl Component for CategoriesWidget {
+    fn constraint(&self) -> Constraint {
+        Constraint::Percentage(30)
+    }
 
-impl Widget for CategoriesWidget {
-    fn render(self, area: Rect, buf: &mut Buffer)
-    where
-        Self: Sized,
-    {
-        let block = Block::bordered().title("[1] Categories");
-
-        block.render(area, buf);
+    fn draw(&mut self, frame: &mut Frame, area: Rect) {
+        frame.render_widget(Block::bordered().title("[1] Categories"), area);
     }
 }

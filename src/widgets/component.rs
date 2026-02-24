@@ -1,7 +1,7 @@
 use ratatui::{
     Frame,
     crossterm::event::{Event, KeyEvent},
-    layout::Rect,
+    layout::{Constraint, Rect},
 };
 use tokio::sync::mpsc::UnboundedSender;
 
@@ -31,4 +31,8 @@ pub trait Component {
     fn handle_key_event(&mut self, key: KeyEvent) {}
 
     fn draw(&mut self, frame: &mut Frame, area: Rect) {}
+
+    fn constraint(&self) -> Constraint {
+        Constraint::Fill(1)
+    }
 }

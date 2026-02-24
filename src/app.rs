@@ -1,4 +1,7 @@
-use ratatui::crossterm::event::{self, KeyCode};
+use ratatui::{
+    crossterm::event::{self, KeyCode},
+    layout::{Constraint, Layout},
+};
 use tokio::sync::mpsc;
 
 use crate::{
@@ -23,8 +26,8 @@ impl App {
         App {
             should_exit: false,
             components: vec![
-                Box::new(ToDoListWidget::new()),
                 Box::new(CategoriesWidget::new()),
+                Box::new(ToDoListWidget::new()),
             ],
             action_tx,
             action_rx,
@@ -57,8 +60,16 @@ impl App {
 
     fn render(&mut self, tui: &mut Tui) -> color_eyre::Result<()> {
         tui.terminal.draw(|f| {
-            for component in self.components.iter_mut() {
-                component.draw(f, f.area());
+            let constraints = self
+                .components
+                .iter()
+                .map(|f| f.constraint())
+                .collect::<Vec<Constraint>>();
+
+            let layout = Layout::horizontal(constraints).split(f.area());
+
+            for (component, area) in self.components.iter_mut().zip(layout.iter()) {
+                component.draw(f, *area);
             }
         })?;
 
