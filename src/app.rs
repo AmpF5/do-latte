@@ -4,47 +4,69 @@ use ratatui::{
     layout::{Constraint, Layout},
     widgets::Block,
 };
+use tokio::sync::mpsc;
 
 use crate::{
+    action::Action,
     todo_item::TodoItem,
-    widgets::{categories_widget::CategoriesWidget, todo_list_widget::ToDoListWidget},
+    tui::Tui,
+    widgets::{
+        categories_widget::CategoriesWidget, component::Component, todo_list_widget::ToDoListWidget,
+    },
 };
 
-#[derive(Default)]
 pub struct App {
     should_exit: bool,
-    todo_list: Vec<TodoItem>,
+    components: Vec<Box<dyn Component>>,
+    action_tx: mpsc::UnboundedSender<Action>,
+    action_rx: mpsc::UnboundedReceiver<Action>,
 }
 
 impl App {
+    pub fn new() -> Self {
+        let (action_tx, action_rx) = mpsc::unbounded_channel();
+
+        App {
+            should_exit: false,
+            components: vec![
+                Box::new(ToDoListWidget::new()),
+                Box::new(CategoriesWidget::new()),
+            ],
+            action_tx,
+            action_rx,
+        }
+    }
     // main app loop
     pub fn run(&mut self, terminal: &mut DefaultTerminal) -> anyhow::Result<()> {
-        while !self.should_exit {
-            terminal.draw(App::render)?;
+        let mut tui = Tui::new();
+
+        tui.enter();
+
+        for component in self.components.iter_mut() {
+            component.register_action_handler(self.action_tx.clone());
+        }
+
+        loop {
+            // terminal.draw(self.render())?;
             if let Some(key) = event::read()?.as_key_press_event() {
-                self.handle_key_press(key);
+                self.render(&mut tui);
+                match key.code {
+                    KeyCode::Char('q') => {
+                        tui.exit();
+                    }
+                    _ => {}
+                }
             }
         }
 
         Ok(())
     }
 
-    // handle key press events
-    fn handle_key_press(&mut self, key: KeyEvent) {
-        match key.code {
-            KeyCode::Char('q') => {
-                self.should_exit = true;
+    fn render(&mut self, tui: &mut Tui) {
+        tui.terminal.draw(|f| {
+            for component in self.components.iter_mut() {
+                component.draw(f, f.area());
             }
-            _ => {}
-        }
-    }
-
-    fn render(frame: &mut Frame) {
-        let [left, right] =
-            Layout::horizontal([Constraint::Percentage(30), Constraint::Percentage(70)])
-                .areas(frame.area());
-
-        frame.render_widget(CategoriesWidget::new(), left);
-        frame.render_widget(ToDoListWidget::new(), right);
+        });
     }
 }

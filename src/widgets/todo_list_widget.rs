@@ -1,9 +1,12 @@
 use ratatui::{
+    Frame,
     buffer::Buffer,
     layout::Rect,
     text::Line,
     widgets::{Block, Widget},
 };
+
+use crate::widgets::component::Component;
 
 #[derive(Default)]
 pub struct ToDoListWidget {}
@@ -14,14 +17,14 @@ impl ToDoListWidget {
     }
 }
 
-impl Widget for ToDoListWidget {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        let instructions = Line::from(vec!["[a] - add new".into()]);
+impl Component for ToDoListWidget {
+    fn init(&mut self) {}
 
-        let block = Block::bordered()
-            .title("[2] List")
-            .title_bottom(instructions);
+    fn handle_key_event(&mut self, key: ratatui::crossterm::event::KeyEvent) {
+        println!("{:?}", key);
+    }
 
-        block.render(area, buf);
+    fn draw(&mut self, frame: &mut Frame, area: Rect) {
+        frame.render_widget(Block::bordered().title("To do"), area);
     }
 }

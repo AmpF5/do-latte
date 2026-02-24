@@ -4,6 +4,8 @@ use ratatui::{
     widgets::{Block, Widget},
 };
 
+use crate::widgets::component::Component;
+
 #[derive(Default)]
 pub struct CategoriesWidget {}
 
@@ -12,6 +14,8 @@ impl CategoriesWidget {
         Self {}
     }
 }
+
+impl Component for CategoriesWidget {}
 
 impl Widget for CategoriesWidget {
     fn render(self, area: Rect, buf: &mut Buffer)
