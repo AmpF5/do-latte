@@ -43,12 +43,12 @@ impl App {
             component.register_action_handler(self.action_tx.clone());
         }
 
-        loop {
+        while !self.should_exit {
+            self.render(&mut tui)?;
             if let Some(key) = event::read()?.as_key_press_event() {
-                self.render(&mut tui)?;
                 match key.code {
                     KeyCode::Char('q') => {
-                        tui.exit();
+                        self.should_exit = true;
                     }
                     _ => {}
                 }
