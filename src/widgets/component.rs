@@ -7,6 +7,28 @@ use tokio::sync::mpsc::UnboundedSender;
 
 use crate::action::Action;
 
+pub struct ComponentEntry {
+    pub component: Box<dyn Component>,
+    pub constraint: Constraint,
+    pub focus_key: Option<char>,
+    pub is_focused: bool,
+}
+
+impl ComponentEntry {
+    pub fn new(
+        component: Box<dyn Component>,
+        constraint: Constraint,
+        focus_key: Option<char>,
+    ) -> Self {
+        Self {
+            component,
+            constraint,
+            focus_key,
+            is_focused: false,
+        }
+    }
+}
+
 pub trait Component {
     fn init(&mut self) {}
 
@@ -28,11 +50,9 @@ pub trait Component {
         }
     }
 
-    fn handle_key_event(&mut self, key: KeyEvent) {}
+    fn handle_key_event(&mut self, _key: KeyEvent) {}
 
-    fn draw(&mut self, frame: &mut Frame, area: Rect) {}
+    fn register_focus_key(&mut self, _focus_key: Option<char>) {}
 
-    fn constraint(&self) -> Constraint {
-        Constraint::Fill(1)
-    }
+    fn draw(&mut self, _frame: &mut Frame, _area: Rect, _in_focused: bool) {}
 }
