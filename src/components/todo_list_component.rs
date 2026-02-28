@@ -1,4 +1,8 @@
-use ratatui::{Frame, layout::Rect, widgets::Block};
+use ratatui::{
+    Frame,
+    layout::Rect,
+    widgets::Block,
+};
 use tokio::sync::mpsc::UnboundedSender;
 
 use crate::{action::Action, components::component::Component, utils::liner_builder::LineBuilder};
@@ -30,9 +34,17 @@ impl Component for ToDoListComponent {
         let mut border = Block::bordered().title(title_top);
 
         if is_focused {
-            let bottom_text = LineBuilder::new("Add").bold_first_char().build();
+            let add_line = LineBuilder::new("Add")
+                .bold_first_char()
+                .surround_first_letter_with_brackets()
+                .build();
 
-            border = border.title_bottom(bottom_text);
+            let delete_line = LineBuilder::new("Delete")
+                .bold_first_char()
+                .surround_first_letter_with_brackets()
+                .build();
+
+            border = border.title_bottom(add_line).title_bottom(delete_line);
         }
 
         frame.render_widget(border, area);

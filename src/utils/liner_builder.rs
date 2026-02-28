@@ -23,7 +23,6 @@ impl<'a> LineBuilder<'a> {
         if self.spans.is_empty() {
             return self;
         };
-
         if let Some(first_span) = self.spans.first_mut() {
             let content = first_span.to_string();
             let mut chars = content.char_indices();
@@ -37,6 +36,13 @@ impl<'a> LineBuilder<'a> {
                 self.spans.insert(1, Span::from(rest));
             }
         }
+
+        self
+    }
+
+    pub fn surround_first_letter_with_brackets(mut self) -> Self {
+        self.spans.insert(0, Span::from('['.to_string()));
+        self.spans.insert(2, Span::from(']'.to_string()));
 
         self
     }
