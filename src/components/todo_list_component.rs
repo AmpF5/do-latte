@@ -1,21 +1,21 @@
 use ratatui::{Frame, layout::Rect, widgets::Block};
 use tokio::sync::mpsc::UnboundedSender;
 
-use crate::{action::Action, utils::liner_builder::LineBuilder, widgets::component::Component};
+use crate::{action::Action, components::component::Component, utils::liner_builder::LineBuilder};
 
 #[derive(Default, Debug)]
-pub struct ToDoListWidget {
+pub struct ToDoListComponent {
     focus_key: char,
     command_tx: Option<UnboundedSender<Action>>,
 }
 
-impl ToDoListWidget {
+impl ToDoListComponent {
     pub fn new() -> Self {
-        ToDoListWidget::default()
+        ToDoListComponent::default()
     }
 }
 
-impl Component for ToDoListWidget {
+impl Component for ToDoListComponent {
     fn register_focus_key(&mut self, focus_key: Option<char>) {
         self.focus_key = focus_key.expect("focus_key need to be set");
     }

@@ -1,6 +1,6 @@
 use crate::app::App;
+pub mod components;
 mod utils;
-pub mod widgets;
 
 pub mod action;
 pub mod app;

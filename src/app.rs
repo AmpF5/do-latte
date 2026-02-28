@@ -8,11 +8,11 @@ use tracing::{debug, info, warn};
 
 use crate::{
     action::Action,
-    tui::Tui,
-    widgets::{
-        categories_widget::CategoriesWidget, component::ComponentEntry,
-        todo_list_widget::ToDoListWidget,
+    components::{
+        categories_component::CategoriesComponent, component::ComponentEntry,
+        todo_list_component::ToDoListComponent,
     },
+    tui::Tui,
 };
 
 pub struct App {
@@ -31,12 +31,12 @@ impl App {
             should_exit: false,
             components: vec![
                 ComponentEntry::new(
-                    Box::new(CategoriesWidget::new()),
+                    Box::new(CategoriesComponent::new()),
                     Constraint::Percentage(30),
                     Some('1'),
                 ),
                 ComponentEntry::new(
-                    Box::new(ToDoListWidget::new()),
+                    Box::new(ToDoListComponent::new()),
                     Constraint::Percentage(70),
                     Some('2'),
                 ),

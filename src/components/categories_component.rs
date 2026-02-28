@@ -1,19 +1,19 @@
 use ratatui::{Frame, layout::Rect, widgets::Block};
 
-use crate::widgets::component::Component;
+use crate::components::component::Component;
 
 #[derive(Default, Debug)]
-pub struct CategoriesWidget {
+pub struct CategoriesComponent {
     focus_key: char,
 }
 
-impl CategoriesWidget {
+impl CategoriesComponent {
     pub fn new() -> Self {
         Self::default()
     }
 }
 
-impl Component for CategoriesWidget {
+impl Component for CategoriesComponent {
     fn register_focus_key(&mut self, focus_key: Option<char>) {
         self.focus_key = focus_key.expect("focus_key need to be set");
     }
