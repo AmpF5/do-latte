@@ -42,7 +42,7 @@ pub trait Component {
                 Event::FocusGained => todo!(),
                 Event::FocusLost => todo!(),
                 Event::Key(key_event) => self.handle_key_event(key_event),
-                Event::Mouse(mouse_event) => todo!(),
+                Event::Mouse(_mouse_event) => todo!(),
                 Event::Paste(_) => todo!(),
                 Event::Resize(_, _) => todo!(),
             },

@@ -1,5 +1,4 @@
 use ratatui::{Frame, layout::Rect, widgets::Block};
-use tracing::info;
 
 use crate::widgets::component::Component;
 

@@ -1,8 +1,7 @@
-use ratatui::{Frame, layout::Rect, symbols::border, widgets::Block};
+use ratatui::{Frame, layout::Rect, widgets::Block};
 use tokio::sync::mpsc::UnboundedSender;
-use tracing::info;
 
-use crate::{action::Action, widgets::component::Component};
+use crate::{action::Action, utils::liner_builder::LineBuilder, widgets::component::Component};
 
 #[derive(Default, Debug)]
 pub struct ToDoListWidget {
@@ -31,8 +30,9 @@ impl Component for ToDoListWidget {
         let mut border = Block::bordered().title(title_top);
 
         if is_focused {
-            let bottom_title = "test bottom title".to_string();
-            border = border.title_bottom(bottom_title);
+            let bottom_text = LineBuilder::new("Add").bold_first_char().build();
+
+            border = border.title_bottom(bottom_text);
         }
 
         frame.render_widget(border, area);
