@@ -36,7 +36,7 @@ pub trait Component {
         _ = tx;
     }
 
-    fn handle_events(&mut self, event: Option<Event>) {
+    fn handle_events(&mut self, event: Option<Event>) -> Action {
         match event {
             Some(e) => match e {
                 Event::FocusGained => todo!(),
@@ -50,9 +50,11 @@ pub trait Component {
         }
     }
 
-    fn handle_key_event(&mut self, _key: KeyEvent) {}
+    fn handle_key_event(&mut self, _key: KeyEvent) -> Action {
+        Action::None
+    }
 
     fn register_focus_key(&mut self, _focus_key: Option<char>) {}
 
-    fn draw(&mut self, _frame: &mut Frame, _area: Rect, _in_focused: bool) {}
+    fn draw(&mut self, _frame: &mut Frame, _area: Rect, _is_focused: bool) {}
 }

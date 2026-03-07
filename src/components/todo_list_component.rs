@@ -1,14 +1,18 @@
-use ratatui::{
-    Frame,
-    layout::Rect,
-    widgets::Block,
-};
+use crossterm::event::{KeyCode, KeyEvent};
+use ratatui::{Frame, layout::Rect, style::Style, widgets::Block};
 use tokio::sync::mpsc::UnboundedSender;
+use tracing::info;
 
-use crate::{action::Action, components::component::Component, utils::liner_builder::LineBuilder};
+use crate::{
+    action::Action,
+    components::{component::Component, popups::todo_popup_component::ToDoPopupComponent},
+    models::todo_item::TodoItem,
+    utils::liner_builder::LineBuilder,
+};
 
 #[derive(Default, Debug)]
 pub struct ToDoListComponent {
+    todos: Vec<TodoItem>,
     focus_key: char,
     command_tx: Option<UnboundedSender<Action>>,
 }
@@ -48,5 +52,12 @@ impl Component for ToDoListComponent {
         }
 
         frame.render_widget(border, area);
+    }
+
+    fn handle_key_event(&mut self, _key: KeyEvent) -> Action {
+        match _key.code {
+            KeyCode::Char('a') => Action::RenderToDoPopup,
+            _ => Action::None,
+        }
     }
 }

@@ -1,23 +1,30 @@
+use crate::{
+    action::Action,
+    components::{
+        categories_component::CategoriesComponent,
+        component::{Component, ComponentEntry},
+        popups::todo_popup_component::ToDoPopupComponent,
+        todo_list_component::ToDoListComponent,
+    },
+    tui::Tui,
+    widgets::popup::Popup,
+};
 use crossterm::event::KeyEvent;
 use ratatui::{
+    Frame,
+    buffer::Buffer,
     crossterm::event::KeyCode,
-    layout::{Constraint, Layout},
+    layout::{Constraint, Layout, Rect},
+    style::Style,
+    widgets::{BorderType, Borders, Widget},
 };
 use tokio::sync::mpsc;
 use tracing::{debug, info, warn};
 
-use crate::{
-    action::Action,
-    components::{
-        categories_component::CategoriesComponent, component::ComponentEntry,
-        todo_list_component::ToDoListComponent,
-    },
-    tui::Tui,
-};
-
 pub struct App {
     should_exit: bool,
     components: Vec<ComponentEntry>,
+    active_popup: Option<Box<dyn Component>>,
     action_tx: mpsc::UnboundedSender<Action>,
     action_rx: mpsc::UnboundedReceiver<Action>,
 }
@@ -30,17 +37,18 @@ impl App {
         App {
             should_exit: false,
             components: vec![
-                ComponentEntry::new(
-                    Box::new(CategoriesComponent::new()),
-                    Constraint::Percentage(30),
-                    Some('1'),
-                ),
+                // ComponentEntry::new(
+                //     Box::new(CategoriesComponent::new()),
+                //     Constraint::Percentage(30),
+                //     Some('1'),
+                // ),
                 ComponentEntry::new(
                     Box::new(ToDoListComponent::new()),
-                    Constraint::Percentage(70),
+                    Constraint::Percentage(90),
                     Some('2'),
                 ),
             ],
+            active_popup: None,
             action_tx,
             action_rx,
         }
@@ -66,6 +74,15 @@ impl App {
         }
     }
 
+    pub fn handle_component_key(&mut self, key_event: KeyEvent) -> Action {
+        match self.get_focused_component() {
+            Some(focused_component_entry) => focused_component_entry
+                .component
+                .handle_key_event(key_event),
+            None => Action::None,
+        }
+    }
+
     // main app loop
     pub async fn run(&mut self) -> color_eyre::Result<()> {
         info!("starting main loop");
@@ -78,14 +95,6 @@ impl App {
                 .component
                 .register_focus_key(component_entry.focus_key);
         }
-
-        // for component_entry in self.components.iter_mut() {
-        //     component_entry
-        //         .component
-        //         .register_action_handler(self.action_tx.clone());
-        // }
-        //
-        // let action_tx = self.action_tx.clone();
 
         loop {
             self.handle_event(&mut tui).await?;
@@ -142,6 +151,12 @@ impl App {
                 if self.get_components_keys().contains(&ch) {
                     self.set_focus(&ch);
                 }
+
+                let ac = self.handle_component_key(key);
+                debug!("action inside handle key {:?}", ac);
+                action_tx.send(ac)?;
+
+                // action_tx.send(self.handle_component_key(key))?
             }
             _ => {}
         }
@@ -154,11 +169,16 @@ impl App {
             match action {
                 Action::Render => self.render(tui)?,
                 Action::Quit => {
-                    info!("quitting application");
                     self.should_exit = true;
                 }
                 Action::Error(ref err) => {
                     warn!(error = %err, "action error received");
+                }
+                Action::RenderToDoPopup => {
+                    info!("adding popup");
+                    self.active_popup = Some(Box::new(
+                        ToDoPopupComponent::new().title("test".to_string()),
+                    ));
                 }
                 _ => {}
             }
@@ -175,17 +195,39 @@ impl App {
                 .map(|f| f.constraint)
                 .collect::<Vec<Constraint>>();
 
-            let layout = Layout::horizontal(constraints).split(f.area());
+            let layout = Layout::vertical(constraints).split(f.area());
 
             for (component_entry, area) in self.components.iter_mut().zip(layout.iter()) {
                 component_entry
                     .component
                     .draw(f, *area, component_entry.is_focused);
             }
+
+            if let Some(popup_to_render) = &mut self.active_popup {
+                info!("inside popup_render");
+                popup_to_render.draw(f, f.area(), true);
+            }
+
+            // App::show_popup(f.area(), f).unwrap();
         })?;
 
         Ok(())
     }
+
+    // fn show_popup(area: Rect, f: &mut Frame) -> color_eyre::Result<()> {
+    //     let popup_area = Rect {
+    //         x: area.width / 4,
+    //         y: area.height / 3,
+    //         width: area.width / 2,
+    //         height: area.height / 3,
+    //     };
+    //
+    //     Popup::new("Contentja sdijoasdiodsaijodas jio sd")
+    //         .title("Add new To Do")
+    //         .render(popup_area, f.buffer_mut());
+    //
+    //     Ok(())
+    // }
 }
 
 impl Default for App {
