@@ -1,8 +1,15 @@
 use derive_setters::Setters;
-use ratatui::{Frame, layout::Rect, widgets::Widget};
+use ratatui::{
+    Frame,
+    layout::{Constraint, Rect},
+    widgets::{Block, Paragraph, Widget},
+};
 use tracing::info;
 
-use crate::{components::component::Component, widgets::popup::Popup};
+use crate::{
+    components::component::Component,
+    widgets::{popup::Popup, popup_layout::PopupLayout},
+};
 
 #[derive(Default, Debug, Setters)]
 pub struct ToDoPopupComponent {
@@ -26,7 +33,17 @@ impl Component for ToDoPopupComponent {
             height: area.height / 3,
         };
 
-        Popup::new("test body")
+        let layout = PopupLayout::new(popup_area.width, popup_area.height)
+            .row(
+                Constraint::Percentage(20),
+                Paragraph::new("test 1").block(Block::bordered().title("Name")),
+            )
+            .row(
+                Constraint::Percentage(80),
+                Paragraph::new("test 2").block(Block::bordered().title("Content")),
+            );
+
+        Popup::new(layout)
             .title(self.title.clone())
             .bottom_title(self.bottom_title.clone())
             .render(popup_area, frame.buffer_mut());
