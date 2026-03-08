@@ -1,22 +1,16 @@
 use crate::{
     action::Action,
     components::{
-        categories_component::CategoriesComponent,
         component::{Component, ComponentEntry},
         popups::todo_popup_component::ToDoPopupComponent,
         todo_list_component::ToDoListComponent,
     },
     tui::Tui,
-    widgets::popup::Popup,
 };
 use crossterm::event::KeyEvent;
 use ratatui::{
-    Frame,
-    buffer::Buffer,
     crossterm::event::KeyCode,
-    layout::{Constraint, Layout, Rect},
-    style::Style,
-    widgets::{BorderType, Borders, Widget},
+    layout::{Constraint, Layout},
 };
 use tokio::sync::mpsc;
 use tracing::{debug, info, warn};
@@ -128,15 +122,6 @@ impl App {
             _ => {}
         };
 
-        // for component_entry in self.components.iter_mut() {
-        //     if let Some(_action) = component_entry
-        //         .component
-        //         .handle_events(Some(event.clone()))?
-        //     {
-        //         // TODO: handle action from component
-        //     }
-        // }
-
         Ok(())
     }
 
@@ -144,7 +129,6 @@ impl App {
     fn handle_key_event(&mut self, key: KeyEvent) -> color_eyre::Result<()> {
         let action_tx = self.action_tx.clone();
 
-        // TODO: add reading from keybinds and produce Action
         match key.code {
             KeyCode::Char('q') => action_tx.send(Action::Quit)?,
             KeyCode::Char(ch) => {
@@ -152,11 +136,7 @@ impl App {
                     self.set_focus(&ch);
                 }
 
-                let ac = self.handle_component_key(key);
-                debug!("action inside handle key {:?}", ac);
-                action_tx.send(ac)?;
-
-                // action_tx.send(self.handle_component_key(key))?
+                action_tx.send(self.handle_component_key(key))?
             }
             _ => {}
         }
@@ -177,7 +157,9 @@ impl App {
                 Action::RenderToDoPopup => {
                     info!("adding popup");
                     self.active_popup = Some(Box::new(
-                        ToDoPopupComponent::new().title("test".to_string()),
+                        ToDoPopupComponent::new()
+                            .title("test".to_string())
+                            .bottom_title("test bottom_title".to_string()),
                     ));
                 }
                 _ => {}
@@ -207,27 +189,10 @@ impl App {
                 info!("inside popup_render");
                 popup_to_render.draw(f, f.area(), true);
             }
-
-            // App::show_popup(f.area(), f).unwrap();
         })?;
 
         Ok(())
     }
-
-    // fn show_popup(area: Rect, f: &mut Frame) -> color_eyre::Result<()> {
-    //     let popup_area = Rect {
-    //         x: area.width / 4,
-    //         y: area.height / 3,
-    //         width: area.width / 2,
-    //         height: area.height / 3,
-    //     };
-    //
-    //     Popup::new("Contentja sdijoasdiodsaijodas jio sd")
-    //         .title("Add new To Do")
-    //         .render(popup_area, f.buffer_mut());
-    //
-    //     Ok(())
-    // }
 }
 
 impl Default for App {

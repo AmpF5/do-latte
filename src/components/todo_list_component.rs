@@ -1,12 +1,9 @@
 use crossterm::event::{KeyCode, KeyEvent};
-use ratatui::{Frame, layout::Rect, style::Style, widgets::Block};
+use ratatui::{Frame, layout::Rect, widgets::Block};
 use tokio::sync::mpsc::UnboundedSender;
-use tracing::info;
 
 use crate::{
-    action::Action,
-    components::{component::Component, popups::todo_popup_component::ToDoPopupComponent},
-    models::todo_item::TodoItem,
+    action::Action, components::component::Component, models::todo_item::TodoItem,
     utils::liner_builder::LineBuilder,
 };
 

@@ -43,6 +43,8 @@ pub struct Popup<'content, W> {
     pub body: W,
     /// The title of the popup.
     pub title: Line<'content>,
+    /// Bottom title of the popup.
+    pub bottom_title: Line<'content>,
     /// The style to apply to the entire popup.
     pub style: Style,
     /// The borders of the popup.
@@ -63,6 +65,7 @@ impl<W> fmt::Debug for Popup<'_, W> {
             .field("borders", &self.borders)
             .field("border_set", &self.border_set)
             .field("border_style", &self.border_style)
+            .field("bottom_title", &self.bottom_title)
             .finish()
     }
 }
@@ -75,6 +78,7 @@ impl<W: PartialEq> PartialEq for Popup<'_, W> {
             && self.borders == other.borders
             && self.border_set == other.border_set
             && self.border_style == other.border_style
+            && self.bottom_title == other.bottom_title
     }
 }
 
@@ -100,6 +104,7 @@ impl<W> Popup<'_, W> {
             border_set: Set::default(),
             border_style: Style::default(),
             title: Line::default(),
+            bottom_title: Line::default(),
             style: Style::default(),
         }
     }
@@ -179,9 +184,7 @@ impl<W: KnownSize + Widget> StatefulWidget for Popup<'_, W> {
     type State = PopupState;
 
     fn render(self, area: Rect, buf: &mut Buffer, state: &mut Self::State) {
-        let area = area.clamp(buf.area);
-        // let popup_area = self.popup_area(state, area);
-        let popup_area = area;
+        let popup_area = area.clamp(buf.area);
 
         state.area.replace(popup_area);
 
@@ -191,6 +194,7 @@ impl<W: KnownSize + Widget> StatefulWidget for Popup<'_, W> {
             .border_set(self.border_set)
             .border_style(self.border_style)
             .title(self.title)
+            .title_bottom(self.bottom_title)
             .style(self.style);
         let inner_area = block.inner(popup_area);
         block.render(popup_area, buf);
@@ -237,6 +241,7 @@ where
             .border_set(self.border_set)
             .border_style(self.border_style)
             .title(self.title.clone())
+            .title_bottom(self.bottom_title.clone())
             .style(self.style);
         let inner_area = block.inner(popup_area);
         block.render(popup_area, buf);

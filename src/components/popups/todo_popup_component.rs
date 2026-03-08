@@ -2,14 +2,12 @@ use derive_setters::Setters;
 use ratatui::{Frame, layout::Rect, widgets::Widget};
 use tracing::info;
 
-use crate::{
-    components::component::Component,
-    widgets::popup::{self, Popup},
-};
+use crate::{components::component::Component, widgets::popup::Popup};
 
 #[derive(Default, Debug, Setters)]
 pub struct ToDoPopupComponent {
     pub title: String,
+    pub bottom_title: String,
 }
 
 impl ToDoPopupComponent {
@@ -30,6 +28,7 @@ impl Component for ToDoPopupComponent {
 
         Popup::new("test body")
             .title(self.title.clone())
+            .bottom_title(self.bottom_title.clone())
             .render(popup_area, frame.buffer_mut());
     }
 }
